@@ -4,11 +4,12 @@ const express = require("express")
 
 const router = express.Router();
 
-const userController = require('../controllers/users-controller')
+const userController = require('../controllers/users-controller');
+const fileUpload = require("../middleware/file-upload");
 
 router.get('/', userController.getAllUsers)
 
-router.post('/signup', userController.signUp)
+router.post('/signup', fileUpload.single('image'), userController.signUp)
 
 router.post('/login', userController.login)
 

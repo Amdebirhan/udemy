@@ -2,16 +2,16 @@ const HttpError = require("../models/http-error");
 const user = require("../models/user");
 
 const getAllUsers = async (req, res, next) => {
-    let result;
+    let users;
 
     try {
-        result = await user.find({}, 'email name')
+        users = await user.find({}, '-password')
     } catch (err) {
         const error = new HttpError('Can not featch users please try again.', 500);
         return next(error);
     }
 
-    res.json(result)
+    res.json({ users: users.map(user => user.toObject({ getters: true })) })
 }
 
 const signUp = async (req, res, next) => {
@@ -33,7 +33,7 @@ const signUp = async (req, res, next) => {
         name,
         email,
         password,
-        image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8ZmFjZXxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+        image: req.file.path,
         places: []
     });
 
@@ -44,7 +44,7 @@ const signUp = async (req, res, next) => {
         return next(error);
     }
 
-    res.status(201).json(createUser)
+    res.status(201).json({ user: createUser.toObject({ getters: true }) })
 }
 
 
@@ -63,7 +63,7 @@ const login = async (req, res, next) => {
         return next(error);
     }
 
-    res.json({ message: "login successfully" })
+    res.json({ user: userExist.toObject({ getters: true }) })
 }
 
 exports.getAllUsers = getAllUsers;
